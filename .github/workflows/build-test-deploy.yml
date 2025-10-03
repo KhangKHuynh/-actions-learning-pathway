@@ -9,7 +9,7 @@ jobs:
       - name: use node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18.x'
+          node-version: latest
       - run: npm install
       - run: npm run build 
   test: 
@@ -21,8 +21,8 @@ jobs:
       - name: use node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18.x'
-      - run: npm install -g npm@11.6.1
+          node-version: latest
+      - run: npm install 
       - run: npm test
         env: 
           CI: false
