@@ -71,7 +71,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: github-pages
-          path: ./out
+          path: .next/output/static
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v4
