@@ -14,28 +14,31 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # Step 1: Checkout the repo
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Step 2: Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: npm
 
+      # Step 3: Install dependencies
       - name: Install dependencies
         run: npm ci
 
-    
+      # Step 4: Build Next.js with static export
       - name: Build Next.js app
         run: npm run build
 
+      # Step 5: Upload static files as artifact
       - name: Upload build output
         uses: actions/upload-artifact@v4
         with:
           name: github-pages
           path: .next/output/static
-
 
   test:
     needs: build
@@ -53,7 +56,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-     
       - name: Run tests
         run: npm test || true
         env:
@@ -62,22 +64,24 @@ jobs:
   deploy:
     needs: test
     runs-on: ubuntu-latest
-    environment:
-      name: production
-      url: ${{ steps.deployment.outputs.page_url }}
-
     steps:
+      # Step 1: Download the artifact
       - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
           name: github-pages
-          path: .next/output/static
+          path: ./static
 
+      # Step 2: Configure GitHub Pages
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v4
         with:
           static_site_generator: next
 
+      # Step 3: Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          path: ./static
+
