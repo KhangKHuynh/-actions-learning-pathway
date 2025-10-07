@@ -1,4 +1,4 @@
-name: build-test-deploy
+name: Build and Deploy Next.js to GitHub Pages
 
 on:
   push:
@@ -13,76 +13,48 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      # Step 1: Checkout repository
+      # 1️⃣ Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Setup Node.js
+      # 2️⃣ Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: npm
 
-      # Step 3: Install dependencies
+      # 3️⃣ Install dependencies
       - name: Install dependencies
         run: npm ci
 
-      # Step 4: Build Next.js app
-      - name: Build Next.js app
-        run: npm run build
-
-      # Step 5: Prepare static build for GitHub Pages
-      - name: Prepare static build
+      # 4️⃣ Build and export static Next.js site
+      - name: Build and export Next.js app
         run: |
-          mkdir -p out
-          # Copy only top-level HTML pages (index.html, 404.html, 500.html)
-          find .next/server/pages -maxdepth 1 -name '*.html' -exec cp {} out/ \;
-          # Copy Next.js static assets
-          cp -r .next/static/* out/_next/
+          npm run build
+          npm run export
 
-      # Step 6: Upload build artifact
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+      # 5️⃣ Upload static output for Pages
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: github-pages
           path: ./out
 
-  test:
+  deploy:
     needs: build
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run tests
-        run: npm test || true
-        env:
-          CI: false
-
-  deploy:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      # Step 1: Configure GitHub Pages
+      # 6️⃣ Configure GitHub Pages
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v4
-        with:
-          static_site_generator: next
 
-      # Step 2: Deploy artifact
+      # 7️⃣ Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
 
