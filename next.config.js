@@ -1,11 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
+  images: { unoptimized: true },
+  basePath: '/actions-learning-pathway',  
+  assetPrefix: '/actions-learning-pathway/', 
+};
 
-  images: {
-    unoptimized: true,
-  },
-  
-}
-
-module.exports = nextConfig
+module.exports = nextConfig;
